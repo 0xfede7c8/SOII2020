@@ -5,10 +5,13 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h> 
+#include <unistd.h>
+
 #define TAM 256
 
 int main( int argc, char *argv[] ) {
-	int sockfd, puerto, n;
+	int sockfd, puerto;
+	ssize_t n;
 	struct sockaddr_in serv_addr;
 	struct hostent *server;
 	int terminar = 0;
@@ -33,8 +36,8 @@ int main( int argc, char *argv[] ) {
 	}
 	memset( (char *) &serv_addr, '0', sizeof(serv_addr) );
 	serv_addr.sin_family = AF_INET;
-	bcopy( (char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length );
-	serv_addr.sin_port = htons( puerto );
+	bcopy( (char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, (size_t)server->h_length );
+	serv_addr.sin_port = htons( (uint16_t)puerto );
 	if ( connect( sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr ) ) < 0 ) {
 		perror( "conexion" );
 		exit( 1 );
