@@ -4,13 +4,16 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <unistd.h>
 #define TAM 256
 
 int main( int argc, char *argv[] ) {
-	int sockfd, newsockfd, puerto, clilen, pid;
+	int sockfd, newsockfd, pid;
+	socklen_t clilen;
+	uint16_t puerto;
 	char buffer[TAM];
 	struct sockaddr_in serv_addr, cli_addr;
-	int n;
+	ssize_t n;
 
 	if ( argc < 2 ) {
         	fprintf( stderr, "Uso: %s <puerto>\n", argv[0] );
@@ -24,7 +27,7 @@ int main( int argc, char *argv[] ) {
 	}
 
 	memset( (char *) &serv_addr, 0, sizeof(serv_addr) );
-	puerto = atoi( argv[1] );
+	puerto = (uint16_t)atoi( argv[1] );
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = INADDR_ANY;
 	serv_addr.sin_port = htons( puerto );
