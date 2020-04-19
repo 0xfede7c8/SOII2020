@@ -9,25 +9,21 @@
 
 int tcp_connect_raw(const struct hostent* server, const uint16_t port)
 {
-	int result;
+	int result = -1;
 	struct sockaddr_in serv_addr;
 
 	const int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	
-	if (sockfd < 0) {
-		result = sockfd;
-	} 
-	else
-	{
+	if (sockfd > 0) {
 		memset((char *) &serv_addr, '0', sizeof(serv_addr));
 		serv_addr.sin_family = AF_INET;
 		bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, (size_t)server->h_length);
 		serv_addr.sin_port = htons((uint16_t)port);
 
-		result = connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+		result = connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));	
 	}
 	
-	return result; 
+	return (result < 0) ? result : sockfd; 
 }
 
 int tcp_connect(const char* ip, const char* port)
@@ -41,38 +37,28 @@ int tcp_connect(const char* ip, const char* port)
 
 int tcp_server(const uint16_t port)
 {
-	int sockfd, newsockfd, pid;
-	socklen_t clilen;
-	struct sockaddr_in serv_addr, cli_addr;
-	ssize_t n;
+	int result = -1;
+	struct sockaddr_in serv_addr;
 
-	const int sockfd = socket( AF_INET, SOCK_STREAM, 0);
-	int result = (sockfd == 0);
+	const int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
-	if (result) { 
-		
+	if (sockfd != -1) { 
+		memset((char *) &serv_addr, 0, sizeof(serv_addr));
+		serv_addr.sin_family = AF_INET;
+		serv_addr.sin_addr.s_addr = INADDR_ANY;
+		serv_addr.sin_port = htons(port);
+
+		result = bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
+		if (result != -1) {
+			result = listen(sockfd, 5);
+		}
 	}
-	return result;
-
-	memset( (char *) &serv_addr, 0, sizeof(serv_addr) );
-	puerto = (uint16_t)atoi( argv[1] );
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = INADDR_ANY;
-	serv_addr.sin_port = htons( puerto );
-
-	if ( bind(sockfd, ( struct sockaddr *) &serv_addr, sizeof( serv_addr ) ) < 0 ) {
-		perror( "ligadura" );
-		exit( 1 );
-	}
-
-        printf( "Proceso: %d - socket disponible: %d\n", getpid(), ntohs(serv_addr.sin_port) );
-
-	listen( sockfd, 5 );
+	return (result < 0) ? result : sockfd;
 }
 
 int tcp_server_raw(const char* port)
 {
 	const uint16_t port_int = (uint16_t)atoi(port);
 	// To have the same return value as connect
-	return (server == NULL) ? -1 : tcp_server(port_int);
+	return tcp_server(port_int);
 }
