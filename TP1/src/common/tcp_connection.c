@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#include "tcp_client.h"
+#include "tcp_connection.h"
 
 #define BUFFER_SIZE 256u
 

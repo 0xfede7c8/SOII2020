@@ -4,7 +4,7 @@ SRC_DIR = src
 SERVER_DIR = $(SRC_DIR)/server
 CLIENT_DIR = $(SRC_DIR)/client
 
-INCLUDE_DIR = $(SRC_DIR)
+INCLUDE_DIR = $(SRC_DIR)/common
 BIN_DIR = bin
 
 OBJ_CLIENT_DIR = $(BIN_DIR)/obj/client
@@ -19,17 +19,17 @@ LIBS=-lm
 
 CLIENT_OBJECTS := $(patsubst %.c,%.o,$(wildcard $(CLIENT_DIR)/*.c))
 SERVER_OBJECTS := $(patsubst %.c,%.o,$(wildcard $(SERVER_DIR)/*.c))
-COMMON_OBJECTS := $(patsubst %.c,%.o,$(wildcard $(SRC_DIR)/*.c))
+COMMON_OBJECTS := $(patsubst %.c,%.o,$(wildcard $(INCLUDE_DIR)/*.c))
 
 .PHONY: clean all
 
 # Regla para el cliente
-client: $(CLIENT_OBJECTS)
+client: $(CLIENT_OBJECTS) $(COMMON_OBJECTS)
 	$(CC) -o $(CLIENT_OUT)/$@ $^ $(COMMON_OBJECTS) $(CFLAGS)
 
 # Regla para el backend
-server: $(SERVER_OBJECTS)
+server: $(SERVER_OBJECTS) $(COMMON_OBJECTS)
 	$(CC) -o $(SERVER_OUT)/$@ $^ $(COMMON_OBJECTS) $(CFLAGS)
 
 clean:
-	rm -rf $(OBJECTS_DIR)/*.o $(CLIENT_OUT)/* $(SERVER_OUT)/*
+	rm -rf $(CLIENT_DIR)/*.o $(SERVER_DIR)/*.o $(INCLUDE_DIR)/*.o $(BIN_DIR)/*	 

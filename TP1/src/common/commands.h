@@ -9,7 +9,7 @@ enum Message {
 	USER_LIST,
 	USER_PASSWORD,
 	FILE_LIST,
-	FILE_DOWN	
+	FILE_DOWN
 };
 
 #endif
