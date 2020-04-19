@@ -3,7 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "tcp_client.h"
+#include "tcp_connection.h"
 
 #define TAM 256
 
