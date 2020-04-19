@@ -5,8 +5,6 @@
 
 #include "tcp_connection.h"
 
-#define BUFFER_SIZE 256u
-
 int tcp_connect_raw(const struct hostent* server, const uint16_t port)
 {
 	int result = -1;
@@ -14,7 +12,7 @@ int tcp_connect_raw(const struct hostent* server, const uint16_t port)
 
 	const int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	
-	if (sockfd > 0) {
+	if (sockfd != -1) {
 		memset((char *) &serv_addr, '0', sizeof(serv_addr));
 		serv_addr.sin_family = AF_INET;
 		bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, (size_t)server->h_length);
@@ -61,4 +59,11 @@ int tcp_server_raw(const char* port)
 	const uint16_t port_int = (uint16_t)atoi(port);
 	// To have the same return value as connect
 	return tcp_server(port_int);
+}
+
+int tcp_accept(const int sockfd)
+{
+	struct sockaddr_in cli_addr;
+	socklen_t clilen = sizeof(cli_addr);
+	return accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
 }

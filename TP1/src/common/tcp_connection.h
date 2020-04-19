@@ -39,4 +39,12 @@ int tcp_server_raw(const char* port);
  */
 int tcp_server(const uint16_t port);
 
+/**
+ * Acepta una conexión TCP en el socket creado con anterioridad
+ *
+ * @param sockfd socket donde se hizo listen()
+ * @return Devuelve el mismo tipo de valor que <sys/socket.h> accept()
+ */
+int tcp_accept(const int sockfd);
+
 #endif

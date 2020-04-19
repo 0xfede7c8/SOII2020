@@ -17,7 +17,12 @@ int main(int argc, char *argv[])
 
 	const int sockfd = tcp_connect(argv[1], argv[2]);
 
-	write(sockfd, "hola", 5);
+	if (sockfd > 0)	{
+		authenticate(sockfd);
+	}
+	else {
+		perror("Conexión");
+	}
 
 	return EXIT_SUCCESS;
 } 

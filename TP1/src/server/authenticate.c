@@ -9,5 +9,8 @@ int authenticate(const int fd)
 	if (authenticate_request != AUTHENTICATE_REQUEST) {
 		printf("Not request");
 	}
+	else{
+		printf("requested");
+	}
 	return 1;
 }
