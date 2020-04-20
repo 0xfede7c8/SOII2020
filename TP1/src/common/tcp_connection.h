@@ -1,3 +1,8 @@
+/**
+ * @file
+ * @brief Manejo de conexiones TCP/IP (creación de los sockets y conexión)
+ */
+
 #ifndef TCP_CLIENT_H
 #define TCP_CLIENT_H
 
