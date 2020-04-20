@@ -47,4 +47,13 @@ int tcp_server(const uint16_t port);
  */
 int tcp_accept(const int sockfd);
 
+/**
+ * Funcion helper que crea un servidor TCP/IP y acepta una conexión entrante
+ * 
+ *
+ * @param port puntero al c-string con el puerto
+ * @return El file descriptor de la nueva conexión o -1 en caso de error. Se setea errno.
+ */
+int create_server_and_accept(const char* port);
+
 #endif

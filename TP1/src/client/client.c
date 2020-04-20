@@ -8,12 +8,17 @@
 
 #define TAM 256
 
-int main(int argc, char *argv[]) 
+void print_help(const int argc, char *argv[])
 {
 	if (argc < 3) {
 		fprintf( stderr, "Uso %s host puerto\n", argv[0]);
 		exit( 0 );
 	}
+}
+
+int main(int argc, char *argv[]) 
+{
+	print_help(argc, argv);
 
 	const int sockfd = tcp_connect(argv[1], argv[2]);
 

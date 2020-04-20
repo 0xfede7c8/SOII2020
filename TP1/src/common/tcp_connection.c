@@ -47,7 +47,7 @@ int tcp_server(const uint16_t port)
 		serv_addr.sin_port = htons(port);
 
 		result = bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
-		if (result != -1) {
+		if (result == 0) {
 			result = listen(sockfd, 5);
 		}
 	}
@@ -57,7 +57,6 @@ int tcp_server(const uint16_t port)
 int tcp_server_raw(const char* port)
 {
 	const uint16_t port_int = (uint16_t)atoi(port);
-	// To have the same return value as connect
 	return tcp_server(port_int);
 }
 
@@ -66,4 +65,14 @@ int tcp_accept(const int sockfd)
 	struct sockaddr_in cli_addr;
 	socklen_t clilen = sizeof(cli_addr);
 	return accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
+}
+
+int create_server_and_accept(const char* port)
+{
+	int result = tcp_server_raw(port); 
+	if (result != -1)
+	{
+		result = tcp_accept(result);
+	}
+	return result;
 }

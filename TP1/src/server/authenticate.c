@@ -1,16 +1,14 @@
-#include <stdio.h>
+#include "message_transmission.h"
 
 #include "authenticate.h"
 
 int authenticate(const int fd)
 {
-	enum Message authenticate_request;
-	read(fd, &authenticate_request, sizeof(enum Message));
-	if (authenticate_request != AUTHENTICATE_REQUEST) {
-		printf("Not request");
+	enum Message message = receive_message(fd);
+	if (message == AUTHENTICATE_REQUEST)
+	{
+		message = send_message(fd, AUTHENTICATE_PROCEED);
 	}
-	else{
-		printf("requested");
-	}
+		
 	return 1;
 }
