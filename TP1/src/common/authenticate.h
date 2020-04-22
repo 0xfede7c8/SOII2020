@@ -16,4 +16,11 @@
  */
 int authenticate(int fd);
 
+/**
+ * Devuelve el nombre de usuario de la ultima persona autenticada
+ *
+ * @return puntero constante a char con el nombre de usuario
+ */
+char* getAutheticatedUsername();
+
 #endif

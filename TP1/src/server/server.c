@@ -6,7 +6,7 @@
 #include "tcp_connection.h"
 #include "authenticate.h"
 
-void print_help(const int argc, char *argv[])
+void printHelp(const int argc, char *argv[])
 {
 	if (argc < 2) {
         	fprintf( stderr, "Uso: %s <puerto>\n", argv[0] );
@@ -14,18 +14,23 @@ void print_help(const int argc, char *argv[])
 	}
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 	
-	print_help(argc, argv);
+	printHelp(argc, argv);
 
-	const int newsockfd = create_server_and_accept(argv[1]);
+	const int sockfd = createServerAndAccept(argv[1]);
 
-	if (newsockfd < 0) {
-		perror( "creacion de server" );
+	if (sockfd > 0) {
+		if (authenticate(sockfd)) {
+
+		}
+		
+	} else {
+		perror("[-] Problema creando servidor. Saliendo");
 		exit(1);
 	}
 
-	authenticate(newsockfd);
-
+	close(sockfd);
 	return EXIT_SUCCESS; 
 } 

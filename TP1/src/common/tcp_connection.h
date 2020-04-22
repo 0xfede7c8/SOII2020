@@ -16,7 +16,7 @@
  * @param port un c-string conteniendo el puerto a conectar
  * @return Devuelve el mismo tipo de valor que <sys/socket.h> connect()
  */
-int tcp_connect(const char* ip, const char* port);
+int TCPConnect(const char* ip, const char* port);
 
 /**
  * Conectarse mediante TCP/IP a un servidor
@@ -25,7 +25,7 @@ int tcp_connect(const char* ip, const char* port);
  * @param port uint16_t conteniendo el puerto a conectar
  * @return Devuelve el mismo tipo de valor que <sys/socket.h> connect()
  */
-int tcp_connect_raw(const struct hostent* ip, const uint16_t port);
+int TCPConnectRaw(const struct hostent* ip, const uint16_t port);
 
 
 /**
@@ -34,7 +34,7 @@ int tcp_connect_raw(const struct hostent* ip, const uint16_t port);
  * @param @param port un c-string conteniendo el puerto a bindear
  * @return Devuelve el mismo tipo de valor que <sys/socket.h> listen()
  */
-int tcp_server_raw(const char* port);
+int TCPServerRawn(const char* port);
 
 /**
  * Crea un servidor TCP/IP
@@ -42,7 +42,7 @@ int tcp_server_raw(const char* port);
  * @param port uint16_t conteniendo el puerto a conectar
  * @return Devuelve el mismo tipo de valor que <sys/socket.h> listen()
  */
-int tcp_server(const uint16_t port);
+int TCPServer(const uint16_t port);
 
 /**
  * Acepta una conexión TCP en el socket creado con anterioridad
@@ -50,7 +50,7 @@ int tcp_server(const uint16_t port);
  * @param sockfd socket donde se hizo listen()
  * @return Devuelve el mismo tipo de valor que <sys/socket.h> accept()
  */
-int tcp_accept(const int sockfd);
+int TCPAccept(const int sockfd);
 
 /**
  * Funcion helper que crea un servidor TCP/IP y acepta una conexión entrante
@@ -59,6 +59,6 @@ int tcp_accept(const int sockfd);
  * @param port puntero al c-string con el puerto
  * @return El file descriptor de la nueva conexión o -1 en caso de error. Se setea errno.
  */
-int create_server_and_accept(const char* port);
+int createServerAndAccept(const char* port);
 
 #endif

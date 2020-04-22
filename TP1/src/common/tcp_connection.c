@@ -5,7 +5,7 @@
 
 #include "tcp_connection.h"
 
-int tcp_connect_raw(const struct hostent* server, const uint16_t port)
+int TCPConnectRaw(const struct hostent* server, const uint16_t port)
 {
 	int result = -1;
 	struct sockaddr_in serv_addr;
@@ -24,16 +24,16 @@ int tcp_connect_raw(const struct hostent* server, const uint16_t port)
 	return (result < 0) ? result : sockfd; 
 }
 
-int tcp_connect(const char* ip, const char* port)
+int TCPConnect(const char* ip, const char* port)
 {
 	const uint16_t port_int = (uint16_t)atoi(port);
 	const struct hostent *server = gethostbyname(ip);
 	
 	// To have the same return value as connect
-	return (server == NULL) ? -1 : tcp_connect_raw(server, port_int);
+	return (server == NULL) ? -1 : TCPConnectRaw(server, port_int);
 ;}
 
-int tcp_server(const uint16_t port)
+int TCPServer(const uint16_t port)
 {
 	int result = -1;
 	struct sockaddr_in serv_addr;
@@ -54,25 +54,25 @@ int tcp_server(const uint16_t port)
 	return (result < 0) ? result : sockfd;
 }
 
-int tcp_server_raw(const char* port)
+int TCPServerRaw(const char* port)
 {
 	const uint16_t port_int = (uint16_t)atoi(port);
-	return tcp_server(port_int);
+	return TCPServer(port_int);
 }
 
-int tcp_accept(const int sockfd)
+int TCPAccept(const int sockfd)
 {
 	struct sockaddr_in cli_addr;
 	socklen_t clilen = sizeof(cli_addr);
 	return accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
 }
 
-int create_server_and_accept(const char* port)
+int createServerAndAccept(const char* port)
 {
-	int result = tcp_server_raw(port); 
+	int result = TCPServerRaw(port); 
 	if (result != -1)
 	{
-		result = tcp_accept(result);
+		result = TCPAccept(result);
 	}
 	return result;
 }

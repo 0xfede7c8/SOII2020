@@ -9,7 +9,7 @@ mkdir -p bin
 
 # Hacemos clean para asegurarnos que no estamos usando archivos desactualizados
 echo "\e[32mLimpiando proyecto...\e[0m"
-make clean;
+# make clean;
 
 # ----- COMPILACION -------
 
@@ -26,8 +26,11 @@ then
 	# Corremos la regla para buildear el backend
 	echo "\e[32mCompilando servidor...\e[0m"
 	make server;
+	make auth;
+	make fileserv;
 	# Ejecutamos el backend
 	echo "\e[32mEjecutando backend...\e[0m"
+	./bin/auth &
 	./bin/server 5000
 else
 	echo "\e[32mOpcion no reconocida: use 'client' o 'backend'\e[0m"

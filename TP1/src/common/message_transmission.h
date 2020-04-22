@@ -25,7 +25,7 @@ typedef struct Credentials {
  * @param fd file descriptor del canal
  * @return Devuelve mensaje MESSAGE_SUCCESS o MESSAGE_FAILED
  */
-Message send_message(const int fd, Message message);
+Message sendMessage(const int fd, Message message);
 
 /**
  * Recibe comando por el fd especificado
@@ -33,7 +33,7 @@ Message send_message(const int fd, Message message);
  * @param fd file descriptor del canal
  * @return Devuelve el mensaje recibido o MESSAGE_FAILED en caso de error
  */
-Message receive_message(const int fd);
+Message receiveMessage(const int fd);
 
 
 /**
@@ -43,7 +43,7 @@ Message receive_message(const int fd);
  * @param credentials puntero a estructura Credentials donde se obtendrán las credenciales a enviar
  * @return Devuelve el mensaje recibido o MESSAGE_FAILED en caso de error
  */
-Message send_credentials(const int fd, const Credentials* credentials);
+Message sendCredentials(const int fd, const Credentials* credentials);
 
 /**
  * Recibe las credenciales por el fd especificado
@@ -52,7 +52,7 @@ Message send_credentials(const int fd, const Credentials* credentials);
  * @param credentials puntero a estructura Credentials donde se devolverán las credenciales
  * @return Devuelve el mensaje recibido o MESSAGE_FAILED en caso de error
  */
-Message receive_credentials(const int fd, Credentials* credentials);
+Message receiveCredentials(const int fd, Credentials* credentials);
 
 /**
  * Chequea si el mensaje fue enviado o recibido correctamente
@@ -60,7 +60,7 @@ Message receive_credentials(const int fd, Credentials* credentials);
  * @param message Message obtenido
  * @return 0 si no es MESSAGE_SUCCESS, 1 si lo es
  */
-int message_ok(Message message);
+int messageOk(Message message);
 
 
 

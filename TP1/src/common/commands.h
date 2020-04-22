@@ -10,8 +10,7 @@
  * Enum que contiene los mensajes de control posibles entre el cliente y servidor
  */
 typedef enum Message {
-	EXIT = 0u,
-	OK,
+	CLIENT_EXIT = 0u,        /*!< Finalización de la conexión por el cliente */
 	AUTHENTICATE_REQUEST,    /*!< Pedido del cliente para autenticarse */ 
 	AUTHENTICATE_PROCEED,    /*!< Pedido del cliente para autenticarse concedido */ 
 	AUTHENTICATE_BLOCKED,    /*!< Autenticación bloqueada por el servidor */ 
