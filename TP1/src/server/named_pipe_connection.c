@@ -2,7 +2,10 @@
 
 int getFIFOs(int* readfd, int* writefd)
 {
-    *readfd = getFIFORead(SERVER_READ_FIFO_NAME);
+    /* El orden con el cual se abren las FIFOS
+     * es muy importante. De ser cambiado produciría el 
+     * bloqueo del sistema */
     *writefd = getFIFOWrite(SERVER_WRITE_FIFO_NAME);
+    *readfd = getFIFORead(SERVER_READ_FIFO_NAME);
     return (*readfd > 0) && (*writefd > 0);
 }
