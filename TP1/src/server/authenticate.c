@@ -14,23 +14,21 @@
  * @param 
  * @return 
  */
-int checkAgainstAuthServer(const Credentials* credentials) 
+Message checkAgainstAuthServer(const Credentials* credentials) 
 {
 	int readFd, writeFd;
-	bool result = false;
-	Message message;
+	Message message = AUTHENTICATE_FAILED;
 	if (getFIFOs(&readFd, &writeFd)) {
 		message = sendCredentials(writeFd, credentials);
 		if (messageOk(message))
 		{
 			printf("[*] Credenciales recibidas por el auth server\n");
 			message = receiveMessage(readFd);
-			result = message == AUTHENTICATE_PASSED; // todo
 		}
 	} else {
 		printf("[-] No se pudo establecer comunicación con el auth server\n");
 	}
-	return result;
+	return message;
 }
 
 
@@ -50,14 +48,19 @@ int authenticate(const int fd)
 					printf("[*] Usuario: %s\n", credentials.username);
 					printf("[*] Contraseña: %s\n", credentials.password);
 					printf("[*] Enviando credenciales al auth server\n");
-					if (checkAgainstAuthServer(&credentials)) {
+					message = checkAgainstAuthServer(&credentials); 
+					if (message == AUTHENTICATE_PASSED) {
 						authenticated = true;
 						message = sendMessage(fd, AUTHENTICATE_PASSED);
 						printf("[+] Autenticación exitosa\n");
-					}
-					else {
+					} else if (message == AUTHENTICATE_FAILED) {
 						printf("[-] Autenticación fallida\n");
 						message = sendMessage(fd, AUTHENTICATE_FAILED);
+					} else if (message == AUTHENTICATE_BLOCKED) {
+						printf("[-] Usuario bloqueado: %s\n", credentials.username);
+						message = sendMessage(fd, AUTHENTICATE_BLOCKED);
+					} else {
+						printf("[-] Error del auth server. Problema de FIFO, o protocolo");
 					}
 				}
 			}

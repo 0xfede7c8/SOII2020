@@ -17,8 +17,8 @@ AUTH_OBJECTS := $(patsubst %.c,%.o,$(wildcard $(SERVER_DIR)/auth/*.c))
 FILESERV_OBJECTS := $(patsubst %.c,%.o,$(wildcard $(SERVER_DIR)/fileserv/*.c))
 COMMON_OBJECTS := $(patsubst %.c,%.o,$(wildcard $(INCLUDE_DIR)/*.c))
 
-_AUTH_DEPS = csv.h
-AUTH_DEPS = $(patsubst %,$(INCLUDE_DIR)/%,$(_AUTH_DEPS))
+_AUTH_DEPS = csv.h user_authentication.h
+AUTH_DEPS = $(patsubst %,$(SERVER_DIR)/auth/%,$(_AUTH_DEPS))
 
 .PHONY: clean all
 
@@ -34,7 +34,7 @@ server: $(SERVER_OBJECTS) $(COMMON_OBJECTS)
 
 # Regla para el auth service
 auth: $(AUTH_OBJECTS) $(COMMON_OBJECTS) $(AUTH_DEPS)
-	$(CC) -o $(BIN_DIR)/$@ $^ $(CFLAGS)
+	$(CC) -o $(BIN_DIR)/$@ $^ $(CFLAGS) -I$(SERVER_DIR)/auth
 	cp $(SERVER_DIR)/auth/credentials.csv $(BIN_DIR)/
 
 # Regla para el file server
