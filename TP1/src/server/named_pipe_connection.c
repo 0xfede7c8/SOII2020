@@ -1,6 +1,6 @@
 #include "named_pipe_connection.h"
 
-int getFIFOs(int* readfd, int* writefd)
+bool getFIFOs(int* readfd, int* writefd)
 {
     /* El orden con el cual se abren las FIFOS
      * es muy importante. De ser cambiado produciría el 

@@ -15,11 +15,13 @@
 #include <unistd.h>
 #include <stdbool.h>
 
-#define SERVER_WRITE_FIFO_NAME "server_write"
-#define AUTH_SERVICE_WRITE_FIFO_NAME "auth_write"
+#define SERVER_WRITE_FIFO_NAME "bin/server_write"
+#define AUTH_SERVICE_WRITE_FIFO_NAME "bin/auth_write"
 
 #define SERVER_READ_FIFO_NAME AUTH_SERVICE_WRITE_FIFO_NAME
 #define AUTH_SERVICE_READ_FIFO_NAME SERVER_WRITE_FIFO_NAME
+
+bool createFIFOs();
 
 inline int getFIFOfd(const char* fifo_name, int flag)
 {
@@ -38,14 +40,14 @@ inline int getFIFOWrite(const char* fifo_name)
 
 /**
  * Obtiene los file descriptor de escritura y lectura.
- * Cada parte debe implementar éste método por separado.
+ * Cada parte debe implementar este método por separado.
  *
  * @param readfd puntero a entero que contendrá el fd de lectura
  * @param writefd puntero a entero que contendrá el fd de escritura
- * @return 0 o -1 dependiendo si la creación fue exitosa
+ * @return bool dependiendo el resultado
  */
-int getFIFOs(int* readfd, int* writefd);
+bool getFIFOs(int* readfd, int* writefd);
 
-int createFIFO(const char* fifoPath);
+bool createFIFO(const char* fifoPath);
 
 #endif

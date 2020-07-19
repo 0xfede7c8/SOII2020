@@ -13,7 +13,7 @@ void printASCIIArt();
  *
  * @param username puntero a char con el nombre de usuario
  */
-void setPromptUsername(char* username);
+void setPromptUsername(const char* username);
 
 /**
  * Tiene la misma interfaz que printf, pero imprime al principio un prompt para el usuario

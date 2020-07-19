@@ -8,6 +8,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <time.h>
 
 #include "message_transmission.h"
 
@@ -23,6 +25,17 @@ void safeExit(const int fd)
 	close(fd);
 	printf("Saliendo...\n");
 	exit(0);
+}
+
+/**
+ * Retorna un nuevo string con el localtime 
+ * @param fd descriptor de comunicación con el servidor
+ */
+char* getCurrentTime()
+{
+  time_t rawtime;
+  time(&rawtime);
+  return asctime(localtime(&rawtime));
 }
 
 #endif

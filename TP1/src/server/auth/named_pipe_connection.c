@@ -1,20 +1,20 @@
 #include "named_pipe_connection.h"
 
-int getFIFOs(int* readfd, int* writefd)
+bool getFIFOs(int* readfd, int* writefd)
 {
-    int result = createFIFO(AUTH_SERVICE_READ_FIFO_NAME) && 
-                 createFIFO(AUTH_SERVICE_WRITE_FIFO_NAME);
-
-    if (result) {
-        *readfd = getFIFORead(AUTH_SERVICE_READ_FIFO_NAME);
-        *writefd = getFIFOWrite(AUTH_SERVICE_WRITE_FIFO_NAME);
-        result = (*readfd > 0) && (*writefd > 0);
-    }
-
-    return result;
+    *readfd = getFIFORead(AUTH_SERVICE_READ_FIFO_NAME);
+    *writefd = getFIFOWrite(AUTH_SERVICE_WRITE_FIFO_NAME);
+    
+    return (*readfd > 0) && (*writefd > 0);
 }
 
-int createFIFO(const char* fifoPath)
+bool createFIFOs()
+{
+    return createFIFO(AUTH_SERVICE_READ_FIFO_NAME) && 
+           createFIFO(AUTH_SERVICE_WRITE_FIFO_NAME);
+}
+
+bool createFIFO(const char* fifoPath)
 {
     struct stat stats;
     // Chequeamos si la FIFO existe

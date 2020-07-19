@@ -12,6 +12,8 @@
 
 #include "prompt.h"
 #include "utils.h"
+#include "message_transmission.h"
+#include "authenticate.h"
 
 #define MAX_CMD_LEN 512u
 #define MAX_CMD_ARGS 32u
@@ -56,8 +58,10 @@ char* getCommand()
 	static char command[MAX_CMD_LEN];
 	memset(command, '\0', MAX_CMD_LEN);
 	if (fgets(command, MAX_CMD_LEN-1, stdin) != NULL) {
-        command[strcspn(command, "\n")] = 0;    // Eliminamos el \n
-        result = command;
+        if (strlen(command) > 1) {
+            command[strcspn(command, "\n")] = 0;    // Eliminamos el \n
+            result = command;
+        }
     }
     return result;
 }
@@ -68,32 +72,33 @@ char* getCommand()
  * @param 
  * @return el comando alocado estaticamente
  */
-int runCommand(const int argc, char* argv[], const int fd)
+bool runCommand(const int argc, char* argv[], const int fd)
 {	
+    Message message = MESSAGE_FAILED;
 	bool result = false; 
 	if (argc > 0) {
 		// Familia de comandos: "user"
 		if (strcmp(argv[0], "user") == 0) {    // Familia de comandos: "user" 
 			result = strcmp(argv[1], "ls") == 0;
 			if (result){ // user ls
-				printf("user ls\n");
+                message = listUsers(fd, fd);
 			}
 			else {   // user passwd 
 				result = strcmp(argv[1], "passwd") == 0;
 				if (result) {
-					printf("user passwd\n");
+                    message = sendMessage(fd, USER_PASSWORD);
 				}
 			}
 		} 
 		else if (strcmp(argv[0], "file") == 0) {    // Familia de comandos: "file"
 			result = strcmp(argv[1], "ls") == 0;    
 			if (result) {   // file ls
-				printf("file ls\n");
+				message = sendMessage(fd, FILE_LIST);
 			}
 			else {    // file down
 				result = strcmp(argv[1], "down") == 0;
 				if (result) {
-					printf("file down\n");
+					message = sendMessage(fd, FILE_DOWN);
 				}
 			}
 		}
@@ -102,7 +107,7 @@ int runCommand(const int argc, char* argv[], const int fd)
             result = true;
 			safeExit(fd);
 		}
-        // Parseamos exit
+        // Parseamos help
         else if (strcmp(argv[0], "help") == 0) {
             result = true;
             printCLIHelp();
@@ -110,6 +115,10 @@ int runCommand(const int argc, char* argv[], const int fd)
 		else {
 			result = false;
 		}
+
+        if (message == MESSAGE_FAILED) {
+            printf("[-] Error interno o de comunicación con el servidor\n");
+        }
 	}
 
 	result = (argc == 0) ? true : result;    // El caso donde no le pasamos ningun comando

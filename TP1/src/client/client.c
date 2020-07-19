@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 	sockfd = TCPConnect(argv[1], argv[2]);
 
 	if (sockfd > 0)	{
-		if (authenticate(sockfd)) {
+		if (authenticate(sockfd, sockfd)) {
 			setPromptUsername(getAutheticatedUsername());
 			printASCIIArt();
 			while (1) {
@@ -50,8 +50,6 @@ int main(int argc, char *argv[])
 					if (!runCommand(argc, argv, sockfd)) {
 						printf("[-] Comando no reconocido: %s\n", command);
 					}
-				} else {
-					printf("[-] Error en entrada de comando. Saliendo.");
 				}
 			}
 		} else {

@@ -17,6 +17,7 @@ typedef enum Message {
 	AUTHENTICATE_FAILED,     /*!< Autenticación fallida */ 
 	AUTHENTICATE_PASSED,     /*!< Autenticación exitosa */ 
 	USER_LIST,				 /*!< Pedido de lista de usuario */ 
+	USER_LIST_FINISH,		 /*!< Mensaje de terminación de envío de lista de usuarios */ 
 	USER_PASSWORD,           /*!< Pedido de cambio de contraseña */ 
 	FILE_LIST,               /*!< Pedido de listado de archivos */ 
 	FILE_DOWN,               /*!< Pedido de descarga de archivos */ 

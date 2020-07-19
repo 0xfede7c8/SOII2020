@@ -21,21 +21,39 @@
 /**
  * Estructura que representa la cantidad de intentos por nombre de usuario 
  */
-typedef struct UserTries {
-    char username[CREDENTIALS_SIZE];
-    uint32_t count;
-} UserTries;
+typedef struct UserInfo {
+    Credentials* credentials;
+    char* lastLoginTime;
+    uint32_t triesCount;
+} UserInfo;
 
 /**
  * Estructura que representa las base de datos
  * de los intentos realizados por cada usuario
  */
-typedef struct TriesDB {
-    UserTries triesArray[CREDENTIAL_LIMIT_AMOUNT];    /*!< DB de intentos */
+typedef struct UserDB {
+    UserInfo userInfo[CREDENTIAL_LIMIT_AMOUNT];  /*!< DB de intentos */
     size_t dbSize;                               /*!< Tamaño de la base de datos */
-} TriesDB;
+} UserDB;
 
-TriesDB triesDB = {.dbSize = 0u};
+UserDB userDB = {.dbSize = 0u};
+
+/**
+ * Carga el arreglo de credenciales obtenido del CSV parseado a la base de datos de usuario
+ * @param credentials puntero al arreglo de credentials
+ * @param credSize tamaño de las credentials
+ * @return cantidad de credentials cargadas 
+ */
+int loadUserDBFromCredentials(Credentials* credentials, const size_t credSize) {
+    int i;
+    for (i=0u; i<(int)credSize; i++) {
+        userDB.userInfo[i].credentials = (credentials+i);
+    }
+    if (credSize > 0) {
+        userDB.dbSize = (size_t)i;
+    }
+    return i;
+}
 
 /**
  * Compara dos Credentials
@@ -49,17 +67,6 @@ int credentialsEqual(const Credentials* cred1, const Credentials* cred2)
             strncmp(cred1->password, cred2->password, CREDENTIALS_SIZE) == 0;
 }
 
-int checkCredentials(const Credentials* inputCredential, const Credentials* csvCredentials, const size_t credAmount)
-{
-    uint32_t i;
-    for (i=0u; i<credAmount; i++) {
-        if (credentialsEqual(inputCredential, csvCredentials+i)) {
-            return true;
-        }
-    }
-    return false;
-}
-
 /**
  * Busca un usuario en la base de datos de intentos
  * @param username nombre de usuario
@@ -69,17 +76,29 @@ int checkCredentials(const Credentials* inputCredential, const Credentials* csvC
 int findUser(const char* username)
 {
     int i;
-    for (i = 0; (size_t)i<triesDB.dbSize; i++) {
-        if (strncmp(triesDB.triesArray[i].username, username, CREDENTIALS_SIZE) == 0) {
+    for (i = 0; (size_t)i<userDB.dbSize; i++) {
+        if (strncmp(userDB.userInfo[i].credentials->username, username, CREDENTIALS_SIZE) == 0) {
             return i;
         }
     }
     return -1;
 }
 
+int checkCredentials(const Credentials* inputCredential)
+{
+    bool result = false;
+    
+    int userIndex = findUser(inputCredential->username);
+    if (userIndex != -1)
+    {
+        result = credentialsEqual(inputCredential, userDB.userInfo[userIndex].credentials);
+    }
+    return result;
+}
+
+
 /**
- * Si no existe una entrada en la base de datos de intentos para un usuario
- * en particular la crea y pone su contador a 1. Si ya existe aumenta el contador.
+ * Actualiza el contador de intentos de un usuario en particular
  * @param username nombre de usuario
  */
 void updateUserTry(const char* username)
@@ -88,13 +107,9 @@ void updateUserTry(const char* username)
     int userIndex = findUser(username);
     if (userIndex != -1) {
         /* Si existe, aumentamos su contador */
-        triesDB.triesArray[userIndex].count++;
+        userDB.userInfo[userIndex].triesCount++;
     } else {
-        /* ...sino, agregamos un nuevo usuario */
-        userIndex = (int)triesDB.dbSize; 
-        strncpy(triesDB.triesArray[userIndex].username, username, CREDENTIALS_SIZE);
-        triesDB.triesArray[userIndex].count = 1u;
-        triesDB.dbSize++;
+        printf("auth: [-] Usuario no encontrado en la DB: %s. No se actualiza contador\n", username);
     }
 }
 /**
@@ -106,9 +121,20 @@ void updateUserTry(const char* username)
 bool userBlocked(const char* username) {
     const int userIndex = findUser(username);
     if (userIndex != -1) {
-        return triesDB.triesArray[userIndex].count >= MAX_TRIES;
+        return userDB.userInfo[userIndex].triesCount >= MAX_TRIES;
     }
     return false;
+}
+
+
+bool listUsers(const int fd)
+{
+    char user1[] = "fefe";
+    char user2[] = "fefefe";
+ 
+    char* userlist[] = {user1, user2};
+
+    return sendUserList(fd, userlist, 2) == MESSAGE_SUCCESS;
 }
 
 #endif

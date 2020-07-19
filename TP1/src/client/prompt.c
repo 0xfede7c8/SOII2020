@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <time.h>
+#include <stdlib.h>
 
 #include "prompt.h"
 
-char* username; 
+char* getCurrentTime();
+
+const char* username; 
 
 void printASCIIArt()
 {
@@ -15,18 +18,12 @@ void printASCIIArt()
     printf("[-] Para conocer los comandos disponibles, ecribir \"help\"\n\n");
 }
 
-char* getCurrentTime()
-{
-  time_t rawtime;
-  time(&rawtime);
-  return asctime(localtime(&rawtime));
-}
-
-void setPromptUsername(char* newUsername) 
+void setPromptUsername(const char* newUsername) 
 {
 	username = newUsername;
 }
 
 void printPrompt() {
-    printf("[%.19s %s] ",getCurrentTime(), username);
+    char* currentTime = getCurrentTime(); 
+    printf("[%.19s %s] ", currentTime, username);
 }
