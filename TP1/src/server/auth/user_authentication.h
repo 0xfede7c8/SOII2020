@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdint.h>
@@ -129,12 +130,44 @@ bool userBlocked(const char* username) {
 
 bool listUsers(const int fd)
 {
-    char user1[] = "fefe";
-    char user2[] = "fefefe";
- 
-    char* userlist[] = {user1, user2};
+    /* Guardamos los usernames recibidos para reenviar al cliente */
+    char *userlist[CREDENTIAL_LIMIT_AMOUNT];
+    
+    /* Alocamos nuevo arreglo con los datos a enviar */
+    uint32_t i;
+    for (i = 0u; i < userDB.dbSize; i++) {
+        userlist[i] = malloc(CREDENTIALS_SIZE*sizeof(char));
+        char *usernamePtr = userlist[i];
+        if (usernamePtr != NULL) {
+            memset(usernamePtr, '\0', CREDENTIALS_SIZE);
+            strncpy(usernamePtr, userDB.userInfo->credentials->username , CREDENTIALS_SIZE);
+        }
+    }
 
-    return sendUserList(fd, userlist, 2) == MESSAGE_SUCCESS;
+    const bool result = sendUserList(fd, userlist, i) == MESSAGE_SUCCESS;
+
+    /* Liberamos el buffer de usernames */
+    for (i = 0u; i < userDB.dbSize; i++) {
+        free(userlist[i]);
+    }
+
+    return result;
+}
+
+Message changePassword(const int serverFd)
+{
+    char newPasswd[CREDENTIALS_SIZE];
+    const ssize_t n = read(serverFd, newPasswd, CREDENTIALS_SIZE);
+
+    Message message = checkMessageSend(n);
+
+    if (messageOk(message)) {
+
+        // TODO: REALMENTE CAMBIAR CLAVE DE USUARIO ACA
+        printf("auth: %s\n", newPasswd);
+        message = sendMessage(serverFd, MESSAGE_SUCCESS);
+    }
+    return message;
 }
 
 #endif

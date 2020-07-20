@@ -7,14 +7,6 @@
 
 #define MAX_MESSAGE_LENGTH 1024
 
-/**
- * Helper para checkear el status de write
- */
-Message checkMessageSend(const ssize_t n)
-{
-	return (n > 0) ? MESSAGE_SUCCESS : MESSAGE_FAILED;
-}
-
 void checkForExit(Message message)
 {
 	if (message == CLIENT_EXIT)

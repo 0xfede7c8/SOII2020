@@ -74,7 +74,7 @@ int main(const int argc, const char *argv[])
                         }
                         break;
                     case USER_PASSWORD:
-                        printf("auth: userpassword\n");
+                        changePassword(fd);
                         break;
                     default:
                         printf("auth: [-] Comando recibido no identificado\n");
@@ -82,7 +82,7 @@ int main(const int argc, const char *argv[])
                 }
             }
         } else {
-            perror("server: [-] Problema creando servidor. Saliendo");
+            perror("server: [-] Problema creando servidor de autenticación. Saliendo");
             exit(1);
         }        
     } else {

@@ -23,6 +23,14 @@ typedef struct Credentials {
 } Credentials;
 
 /**
+ * Helper para checkear el status de write
+ */
+inline Message checkMessageSend(const ssize_t n)
+{
+    return (n > 0) ? MESSAGE_SUCCESS : MESSAGE_FAILED;
+}
+
+/**
  * Envía comando por el fd especificado
  *
  * @param fd file descriptor del canal

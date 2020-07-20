@@ -38,7 +38,6 @@ int authenticate(const int authSockFd, const int fd)
 {
 	/* No utilizamos el auth server, nos comunicamos con el backend directamente */ 
 	(void)authSockFd;
-	
 	Message message = AUTHENTICATE_FAILED;
 	Credentials credentials;
 	bool finish = false;
@@ -90,15 +89,14 @@ void printUser(const char* user)
 	printf("%s\n", user);
 }
 
-Message listUsers(const int authSockFd, const int fd)
+Message listUsers(const int authSockFd, const int serverFd)
 {	
 	/* No utilizamos el auth server, nos comunicamos con el backend directamente */ 
 	(void)authSockFd;
-	Message message = sendMessage(fd, USER_LIST);
+	Message message = sendMessage(serverFd, USER_LIST);
 	
 	if (messageOk(message)) {
-		/* Aca usamos el mismo fd para read y write porque es un socket */
-		message = receiveUserList(fd, printUser);
+		message = receiveUserList(serverFd, printUser);
 	} 
 	return message;
 }

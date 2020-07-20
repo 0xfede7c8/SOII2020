@@ -7,7 +7,7 @@ CLIENT_DIR = $(SRC_DIR)/client
 INCLUDE_DIR = $(SRC_DIR)/common
 BIN_DIR = bin
 
-CFLAGS = -O3 -Wall -Werror -pedantic -Wextra -Wconversion -std=gnu11 -I$(INCLUDE_DIR)
+CFLAGS = -O3 -ggdb -Wall -Werror -pedantic -Wextra -Wconversion -std=gnu11 -I$(INCLUDE_DIR)
 
 LIBS=-lm
 

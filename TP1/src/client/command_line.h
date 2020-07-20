@@ -14,6 +14,7 @@
 #include "utils.h"
 #include "message_transmission.h"
 #include "authenticate.h"
+#include "users_handling.h"
 
 #define MAX_CMD_LEN 512u
 #define MAX_CMD_ARGS 32u
@@ -74,7 +75,7 @@ char* getCommand()
  */
 bool runCommand(const int argc, char* argv[], const int fd)
 {	
-    Message message = MESSAGE_FAILED;
+    Message message = MESSAGE_SUCCESS;
 	bool result = false; 
 	if (argc > 0) {
 		// Familia de comandos: "user"
@@ -86,7 +87,12 @@ bool runCommand(const int argc, char* argv[], const int fd)
 			else {   // user passwd 
 				result = strcmp(argv[1], "passwd") == 0;
 				if (result) {
-                    message = sendMessage(fd, USER_PASSWORD);
+                    if (argc == 3) {
+                        message = changePassword(fd, argv[2]);
+                    } else {
+                        printf("Uso: %s %s <nueva clave>\n", argv[0], argv[1]);
+                        message = MESSAGE_SUCCESS;
+                    }
 				}
 			}
 		} 
@@ -117,7 +123,7 @@ bool runCommand(const int argc, char* argv[], const int fd)
 		}
 
         if (message == MESSAGE_FAILED) {
-            printf("[-] Error interno o de comunicación con el servidor\n");
+            printf("cliente: [-] Error interno o de comunicación con el servidor\n");
         }
 	}
 
