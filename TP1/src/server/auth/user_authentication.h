@@ -16,26 +16,8 @@
 
 #include "message_transmission.h"
 
-#define CREDENTIAL_LIMIT_AMOUNT 10u    /*!< Máxima cantidad de usuarios registrados */
-#define MAX_TRIES 3                    /*!< Máxima cantidad de usuarios intentos de autenticación */
-
-/**
- * Estructura que representa la cantidad de intentos por nombre de usuario 
- */
-typedef struct UserInfo {
-    Credentials* credentials;
-    char* lastLoginTime;
-    uint32_t triesCount;
-} UserInfo;
-
-/**
- * Estructura que representa las base de datos
- * de los intentos realizados por cada usuario
- */
-typedef struct UserDB {
-    UserInfo userInfo[CREDENTIAL_LIMIT_AMOUNT];  /*!< DB de intentos */
-    size_t dbSize;                               /*!< Tamaño de la base de datos */
-} UserDB;
+#define CREDENTIALS_FILE_PATH "bin/credentials.csv"
+#define MAX_TRIES 3    /*!< Máxima cantidad de usuarios intentos de autenticación */
 
 UserDB userDB = {.dbSize = 0u};
 
@@ -85,6 +67,7 @@ int findUser(const char* username)
     return -1;
 }
 
+
 int checkCredentials(const Credentials* inputCredential)
 {
     bool result = false;
@@ -93,10 +76,12 @@ int checkCredentials(const Credentials* inputCredential)
     if (userIndex != -1)
     {
         result = credentialsEqual(inputCredential, userDB.userInfo[userIndex].credentials);
+        if (result != 0) {
+            userDB.lastUserIndex = userIndex;
+        }
     }
     return result;
 }
-
 
 /**
  * Actualiza el contador de intentos de un usuario en particular
@@ -113,6 +98,7 @@ void updateUserTry(const char* username)
         printf("auth: [-] Usuario no encontrado en la DB: %s. No se actualiza contador\n", username);
     }
 }
+
 /**
  * Chequea si un usuario esta bloqueado y actualiza la base de 
  * datos de intentos
@@ -130,29 +116,29 @@ bool userBlocked(const char* username) {
 
 bool listUsers(const int fd)
 {
-    /* Guardamos los usernames recibidos para reenviar al cliente */
-    char *userlist[CREDENTIAL_LIMIT_AMOUNT];
-    
-    /* Alocamos nuevo arreglo con los datos a enviar */
-    uint32_t i;
-    for (i = 0u; i < userDB.dbSize; i++) {
-        userlist[i] = malloc(CREDENTIALS_SIZE*sizeof(char));
-        char *usernamePtr = userlist[i];
-        if (usernamePtr != NULL) {
-            memset(usernamePtr, '\0', CREDENTIALS_SIZE);
-            strncpy(usernamePtr, userDB.userInfo->credentials->username , CREDENTIALS_SIZE);
-        }
-    }
-
-    const bool result = sendUserList(fd, userlist, i) == MESSAGE_SUCCESS;
-
-    /* Liberamos el buffer de usernames */
-    for (i = 0u; i < userDB.dbSize; i++) {
-        free(userlist[i]);
-    }
-
-    return result;
+    return sendUserListFromDB(fd, &userDB) == MESSAGE_SUCCESS;
 }
+
+
+void storeCSV(const UserDB *db, const char* dbPath)
+{
+    FILE* dbFile = fopen(dbPath, "w");
+
+    char lineBuffer[CREDENTIALS_SIZE*3];
+
+    uint32_t i;
+    for (i=0u; i<(size_t)db->dbSize; i++) {
+        snprintf(lineBuffer,
+                 CREDENTIALS_SIZE*3,
+                 "%s,%s\n",
+                 db->userInfo[i].credentials->username,
+                 db->userInfo[i].credentials->password);
+        fputs(lineBuffer, dbFile);
+        memset(lineBuffer, '\0', CREDENTIALS_SIZE*3);
+    }
+    fclose(dbFile);
+}
+
 
 Message changePassword(const int serverFd)
 {
@@ -162,9 +148,9 @@ Message changePassword(const int serverFd)
     Message message = checkMessageSend(n);
 
     if (messageOk(message)) {
-
-        // TODO: REALMENTE CAMBIAR CLAVE DE USUARIO ACA
-        printf("auth: %s\n", newPasswd);
+        strncpy(userDB.userInfo[userDB.lastUserIndex].credentials->password, newPasswd, CREDENTIALS_SIZE);
+        storeCSV(&userDB, CREDENTIALS_FILE_PATH);
+        printf("auth: New password set: %s\n", newPasswd);
         message = sendMessage(serverFd, MESSAGE_SUCCESS);
     }
     return message;

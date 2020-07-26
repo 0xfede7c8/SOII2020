@@ -10,17 +10,7 @@
 #include <stdbool.h>
 
 #include "commands.h"
-
-#define CREDENTIALS_SIZE 30
-#define MAX_STRINGS_SIZE 30
-
-/**
- * Estructura que representa las credenciales del usuario 
- */
-typedef struct Credentials {
-	char username[CREDENTIALS_SIZE];    /*!< nombre de usuario */
-	char password[CREDENTIALS_SIZE];    /*!< contraseña */
-} Credentials;
+#include "users_definitions.h"
 
 /**
  * Helper para checkear el status de write
@@ -83,6 +73,15 @@ Message receiveUserList(const int fd, void (*callback)(const char*));
  * @return Message segun resultado de la operacion
  */
 Message sendUserList(const int fd, char* strings[], const size_t len);
+
+/**
+ * Envia una lista de usuarios
+ *
+ * @param fd file descriptor del canal
+ * @param db puntero a UserDB con los datos a enviar
+ * @return Message segun resultado de la operacion
+ */
+Message sendUserListFromDB(const int fd, const UserDB *db);
 
 /**
  * Chequea si el mensaje fue enviado o recibido correctamente

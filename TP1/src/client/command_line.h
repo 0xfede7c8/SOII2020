@@ -111,7 +111,7 @@ bool runCommand(const int argc, char* argv[], const int fd)
 		// Parseamos exit
 		else if (strcmp(argv[0], "exit") == 0) {
             result = true;
-			safeExit(fd);
+            safeExit(fd);
 		}
         // Parseamos help
         else if (strcmp(argv[0], "help") == 0) {

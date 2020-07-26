@@ -67,12 +67,13 @@ int TCPAccept(const int sockfd)
 	return accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
 }
 
-int createServerAndAccept(const char* port)
-{
-	int result = TCPServerRaw(port); 
-	if (result != -1)
+int createServerAndAccept(const char* port, int *listenFd)
+{	
+	int result = -1;
+	*listenFd = TCPServerRaw(port); 
+	if (*listenFd != -1)
 	{
-		result = TCPAccept(result);
+		result = TCPAccept(*listenFd);
 	}
 	return result;
 }

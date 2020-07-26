@@ -63,6 +63,6 @@ size_t parseUserDataCSV(Credentials* credentials, const size_t credentialsSize, 
         }
     }
     return credentialIndex;
-} 
+}
 
 #endif

@@ -21,7 +21,8 @@ int main(int argc, char *argv[])
     
     printHelp(argc, argv);
 
-    const int fd = createServerAndAccept(argv[1]);
+    int listenFd;
+    int fd = createServerAndAccept(argv[1], &listenFd);
 
     if (fd > 0) {
         /* Conectamos al auth server */
@@ -42,6 +43,13 @@ int main(int argc, char *argv[])
                             break;
                         case FILE_DOWN:
                             printf("filedown\n");
+                            break;
+                        case CLIENT_EXIT:
+                            close(fd);
+                            printf("server: [*] Usuario desconectado\n");
+                            fd = TCPAccept(listenFd);
+                            printf("server: [+] Nuevo usuario conectado. Autenticando..\n");
+                            authenticate(authSockFd, fd);
                             break;
                         case MESSAGE_FAILED:
                             /* No hay nada que leer */

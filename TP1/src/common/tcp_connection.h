@@ -57,8 +57,10 @@ int TCPAccept(const int sockfd);
  * 
  *
  * @param port puntero al c-string con el puerto
+ * @param listenFd puntero donde se guardará el file descriptor del listen, util para aceptar
+          nuevas conexiones
  * @return El file descriptor de la nueva conexión o -1 en caso de error. Se setea errno.
  */
-int createServerAndAccept(const char* port);
+int createServerAndAccept(const char* port, int *listenFd);
 
 #endif

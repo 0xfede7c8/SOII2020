@@ -20,12 +20,15 @@ COMMON_OBJECTS := $(patsubst %.c,%.o,$(wildcard $(INCLUDE_DIR)/*.c))
 _AUTH_DEPS = csv.h user_authentication.h
 AUTH_DEPS = $(patsubst %,$(SERVER_DIR)/auth/%,$(_AUTH_DEPS))
 
+_CLIENT_DEPS = utils.h
+CLIENT_DEPS = $(patsubst %,$(INCLUDE_DIR)/%,$(_CLIENT_DEPS))
+
 .PHONY: clean all
 
 all: client server auth fileserv
 
 # Regla para el cliente
-client: $(CLIENT_OBJECTS) $(COMMON_OBJECTS)
+client: $(CLIENT_OBJECTS) $(COMMON_OBJECTS) $(CLIENT_DEPS)
 	$(CC) -o $(BIN_DIR)/$@ $^ $(CFLAGS)
 
 # Regla para el backend

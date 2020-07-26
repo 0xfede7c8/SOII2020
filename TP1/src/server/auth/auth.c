@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <strings.h>
 
 #include "tcp_connection.h"
 #include "message_transmission.h"
 #include "csv.h"
 #include "user_authentication.h"
+
 
 void authenticate(const int fd)
 {
@@ -49,14 +51,15 @@ int main(const int argc, const char *argv[])
 
     /* Cargamos credenciales */
     Credentials credentialsCSV[CREDENTIAL_LIMIT_AMOUNT];
-    const size_t credAmount = parseUserDataCSV(credentialsCSV, CREDENTIAL_LIMIT_AMOUNT, "bin/credentials.csv");
+    const size_t credAmount = parseUserDataCSV(credentialsCSV, CREDENTIAL_LIMIT_AMOUNT, CREDENTIALS_FILE_PATH);
     
     if (credAmount > 0) {
         /* Las pasamos a la DB para ser usadas por el servicio de autenticación */
         loadUserDBFromCredentials(credentialsCSV, credAmount);
         printf("auth: [+] Credenciales cargadas exitosamente\n");
         
-        const int fd = createServerAndAccept(argv[1]);
+        int listenFd;
+        const int fd = createServerAndAccept(argv[1], &listenFd);
 
         if (fd > 0) {
             /* Bucle */
