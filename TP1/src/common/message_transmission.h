@@ -11,6 +11,7 @@
 
 #include "commands.h"
 #include "users_definitions.h"
+#include "files_definitions.h"
 
 /**
  * Helper para checkear el status de write
@@ -56,23 +57,23 @@ Message sendCredentials(const int fd, const Credentials* credentials);
 Message receiveCredentials(const int fd, Credentials* credentials);
 
 /**
- * Recibe una lista de usuarios
+ * Recibe una lista de strings
  *
  * @param fd file descriptor del canal
  * @param callback callback con funcion a realizar por cada string recibido
  * @return Devuelve MESSAGE_SUCCESS o MESSAGE_FAILED en caso de error
  */
-Message receiveUserList(const int fd, void (*callback)(const char*));
+Message receiveStrings(const int fd, void (*callback)(const char*));
 
 /**
- * Envia una lista de usuarios
+ * Envia una lista de strings
  *
  * @param fd file descriptor del canal
  * @param strings arreglo de strings a enviar
  * @param len cantidad de strings a enviar
  * @return Message segun resultado de la operacion
  */
-Message sendUserList(const int fd, char* strings[], const size_t len);
+Message sendStrings(const int fd, char* strings[], const size_t len);
 
 /**
  * Envia una lista de usuarios
@@ -82,6 +83,47 @@ Message sendUserList(const int fd, char* strings[], const size_t len);
  * @return Message segun resultado de la operacion
  */
 Message sendUserListFromDB(const int fd, const UserDB *db);
+
+/**
+ * Envia una DB de archivos
+ *
+ * @param fd file descriptor del canal
+ * @param db puntero a FileInfoDB con los datos a enviar
+ * @return Message segun resultado de la operacion
+ */
+Message sendFilesDB(const int fd, const FileInfoDB *db);
+
+/**
+ * Recibe DB de archivos
+ *
+ * @param fd file descriptor del canal
+ * @param db puntero a FileInfoDB donde se almacenará la DB
+ * @return Message segun resultado de la operacion
+ */
+Message receiveFilesDB(const int fd, FileInfoDB *db);
+
+
+/**
+ * Recibe un puerto
+ *
+ * @param fd file descriptor del canal
+ * @param port puntero a char donde se almacenará la DB
+ * @return Message segun resultado de la operacion
+ */
+Message receivePort(const int fd, char *port);
+
+/**
+ * Recibe un puerto
+ *
+ * @param fd file descriptor del canal
+ * @param port puerto que se enviará
+ * @return Message segun resultado de la operacion
+ */
+Message sendPort(const int fd, const char *port);
+
+Message sendFile(const int fd, const char *filename);
+
+Message receiveFile(const int fd, const char *filename);
 
 /**
  * Chequea si el mensaje fue enviado o recibido correctamente

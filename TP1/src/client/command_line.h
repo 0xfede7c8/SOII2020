@@ -15,6 +15,7 @@
 #include "message_transmission.h"
 #include "authenticate.h"
 #include "users_handling.h"
+#include "files_handling.h"
 
 #define MAX_CMD_LEN 512u
 #define MAX_CMD_ARGS 32u
@@ -40,11 +41,11 @@ void printCLIHelp()
 void splitCommand(char* command, char** argv, int* argc)
 {
 	*argc = 0;
-  	char* arg = strtok(command, " ,.-");
+  	char* arg = strtok(command, " ");
 	do {
         argv[*argc] = arg;
         (*argc)++;
-        arg = strtok(NULL, " ,.-");
+        arg = strtok(NULL, " ");
 	} while (arg != NULL);
 }
 
@@ -70,10 +71,13 @@ char* getCommand()
 /**
  * Parsea y ejecuta el comando ingresado
  *
- * @param 
+ * @param argc cantidad de parametros
+ * @param argv parametros del comando
+ * @param ip ip del servidor
+ * @param fd file descriptor del servidor
  * @return el comando alocado estaticamente
  */
-bool runCommand(const int argc, char* argv[], const int fd)
+bool runCommand(const int argc, char* argv[], const char* ip, const int fd)
 {	
     Message message = MESSAGE_SUCCESS;
 	bool result = false; 
@@ -99,12 +103,13 @@ bool runCommand(const int argc, char* argv[], const int fd)
 		else if (strcmp(argv[0], "file") == 0) {    // Familia de comandos: "file"
 			result = strcmp(argv[1], "ls") == 0;    
 			if (result) {   // file ls
-				message = sendMessage(fd, FILE_LIST);
+				message = listFiles(fd);
 			}
 			else {    // file down
-				result = strcmp(argv[1], "down") == 0;
+				result = (strcmp(argv[1], "down") == 0) && (argc == 3);
 				if (result) {
-					message = sendMessage(fd, FILE_DOWN);
+                    printf("%s %s\n", ip, argv[2]);
+					message = getFile(fd, ip, argv[2]);
 				}
 			}
 		}
@@ -123,7 +128,7 @@ bool runCommand(const int argc, char* argv[], const int fd)
 		}
 
         if (message == MESSAGE_FAILED) {
-            printf("cliente: [-] Error interno o de comunicación con el servidor\n");
+            printf("[-] Error interno o de comunicación con el servidor\n");
         }
 	}
 

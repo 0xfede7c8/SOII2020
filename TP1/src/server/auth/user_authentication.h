@@ -15,6 +15,7 @@
 #include <stdint.h>
 
 #include "message_transmission.h"
+#include "named_pipe_connection.h"
 
 #define CREDENTIALS_FILE_PATH "bin/credentials.csv"
 #define MAX_TRIES 3    /*!< Máxima cantidad de usuarios intentos de autenticación */
@@ -115,8 +116,16 @@ bool userBlocked(const char* username) {
 
 
 bool listUsers(const int fd)
-{
-    return sendUserListFromDB(fd, &userDB) == MESSAGE_SUCCESS;
+{   
+    (void)fd;    /* Nos comunicamos con el server por la FIFO*/
+    int readFd, writeFd;
+    bool result = getFIFOs(&readFd, &writeFd); 
+    if (result) {
+        result = sendUserListFromDB(writeFd, &userDB) == MESSAGE_SUCCESS;
+        close(readFd);
+        close(writeFd);
+    }
+    return result;
 }
 
 

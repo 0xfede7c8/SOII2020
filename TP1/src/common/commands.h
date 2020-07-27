@@ -20,7 +20,8 @@ typedef enum Message {
 	USER_LIST_FINISH,		 /*!< Mensaje de terminación de envío de lista de usuarios */ 
 	USER_PASSWORD,           /*!< Pedido de cambio de contraseña */ 
 	FILE_LIST,               /*!< Pedido de listado de archivos */ 
-	FILE_DOWN,               /*!< Pedido de descarga de archivos */ 
+	FILE_DOWN,               /*!< Pedido de descarga de archivo */
+	GET_FILE_SERVER_PORT,    /*!< Pedido de información del puerto del file server */
 	MESSAGE_SUCCESS,         /*!< Envío o recepción de mensaje exitoso */ 
 	MESSAGE_FAILED,          /*!< Envío o recepción de mensaje fallida */ 
 } Message;

@@ -44,10 +44,10 @@ int main(int argc, char *argv[])
 				printPrompt();
 				char* command = getCommand();
 				if (command != NULL) {
-					char* argv[MAX_CMD_ARGS];
-					int argc;
-					splitCommand(command, argv, &argc);
-					if (!runCommand(argc, argv, sockfd)) {
+					char* nargv[MAX_CMD_ARGS];
+					int nargc;
+					splitCommand(command, nargv, &nargc);
+					if (!runCommand(nargc, nargv, argv[1], sockfd)) {
 						printf("[-] Comando no reconocido: %s\n", command);
 					}
 				}

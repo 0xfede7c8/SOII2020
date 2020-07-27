@@ -7,6 +7,7 @@
 #include "message_transmission.h"
 #include "csv.h"
 #include "user_authentication.h"
+#include "named_pipe_connection.h"
 
 
 void authenticate(const int fd)
@@ -58,36 +59,39 @@ int main(const int argc, const char *argv[])
         loadUserDBFromCredentials(credentialsCSV, credAmount);
         printf("auth: [+] Credenciales cargadas exitosamente\n");
         
-        int listenFd;
-        const int fd = createServerAndAccept(argv[1], &listenFd);
+        if (createFIFOs()) {
+            int listenFd;
+            const int fd = createServerAndAccept(argv[1], &listenFd);
 
-        if (fd > 0) {
-            /* Bucle */
-            while(1) {
-                Message message = receiveMessage(fd);
-                printf("auth: [*] Mensaje recibido.\n");
-                switch(message) {
-                    /* Pedido de autenticación */
-                    case AUTHENTICATE_REQUEST:
-                        authenticate(fd);
-                        break;
-                    case USER_LIST:
-                        if (!listUsers(fd)) {
-                            printf("auth: [-] No se pudo listar usuarios\n");
-                        }
-                        break;
-                    case USER_PASSWORD:
-                        changePassword(fd);
-                        break;
-                    default:
-                        printf("auth: [-] Comando recibido no identificado\n");
-                        message = sendMessage(fd, MESSAGE_FAILED);
+            if (fd > 0) {
+                /* Bucle */
+                while(1) {
+                    Message message = receiveMessage(fd);
+                    printf("auth: [*] Mensaje recibido.\n");
+                    switch(message) {
+                        /* Pedido de autenticación */
+                        case AUTHENTICATE_REQUEST:
+                            authenticate(fd);
+                            break;
+                        case USER_LIST:
+                            if (!listUsers(fd)) {
+                                printf("auth: [-] No se pudo listar usuarios\n");
+                            }
+                            break;
+                        case USER_PASSWORD:
+                            changePassword(fd);
+                            break;
+                        default:
+                            printf("auth: [-] Comando recibido no identificado\n");
+                            message = sendMessage(fd, MESSAGE_FAILED);
+                    }
                 }
-            }
+            } else {
+                perror("server: [-] Problema creando servidor de autenticación. Saliendo");
+            }        
         } else {
-            perror("server: [-] Problema creando servidor de autenticación. Saliendo");
-            exit(1);
-        }        
+            perror("server: [-] Problema creando FIFOs. Saliendo");
+        }
     } else {
         printf("auth: [-] No se parsearon credenciales. Saliendo.\n");
     }

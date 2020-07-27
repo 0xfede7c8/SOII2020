@@ -6,6 +6,7 @@
 
 #include "message_transmission.h"
 #include "tcp_connection.h"
+#include "named_pipe_connection.h"
 #include "authenticate.h"
 
 /**
@@ -98,11 +99,18 @@ Message listUsers(const int authSockFd, const int clientFd)
 	message = sendMessage(authSockFd, USER_LIST);
 
 	if (messageOk(message)) {
-		/* Recibimos la lista de usuarios desde el auth server */
-		message = receiveUserList(authSockFd, storeUsername);
-		if (messageOk(message)) {
-			/* Enviamos la lista de usuarios al cliente */
-			message = sendUserList(clientFd, usernames, usernameIndex);
+		/* Recibimos la lista de usuarios desde el auth server a traves de la FIFO */
+		int readFd, writeFd;
+		if (getFIFOs(&readFd, &writeFd)) {
+			message = receiveStrings(readFd, storeUsername);
+			if (messageOk(message)) {
+				/* Enviamos la lista de usuarios al cliente */
+				message = sendStrings(clientFd, usernames, usernameIndex);
+			}
+			close(readFd);
+    		close(writeFd);
+		} else {
+			message = MESSAGE_FAILED;
 		}
 	}
 

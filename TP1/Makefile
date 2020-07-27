@@ -30,6 +30,7 @@ all: client server auth fileserv
 # Regla para el cliente
 client: $(CLIENT_OBJECTS) $(COMMON_OBJECTS) $(CLIENT_DEPS)
 	$(CC) -o $(BIN_DIR)/$@ $^ $(CFLAGS)
+	mkdir -p $(BIN_DIR)/file_download
 
 # Regla para el backend
 server: $(SERVER_OBJECTS) $(COMMON_OBJECTS)
@@ -42,8 +43,10 @@ auth: $(AUTH_OBJECTS) $(COMMON_OBJECTS) $(AUTH_DEPS)
 
 # Regla para el file server
 fileserv: $(FILESERV_OBJECTS) $(COMMON_OBJECTS)
-	$(CC) -o $(BIN_DIR)/$@ $^ $(CFLAGS)
+	$(CC) -o $(BIN_DIR)/$@ $^ $(CFLAGS) -lssl -lcrypto
+	mkdir -p $(BIN_DIR)/files
+	cp -r $(SERVER_DIR)/fileserv/files $(BIN_DIR)/
 
 clean:
-	rm -rf $(CLIENT_DIR)/*.o $(SERVER_DIR)/*.o $(INCLUDE_DIR)/*.o $(BIN_DIR)/*
-	rm -rf $(SERVER_DIR)/auth/*.o $(SERVER_DIR)/fileserv/*.o 	 
+	rm -r $(CLIENT_DIR)/*.o $(SERVER_DIR)/*.o $(INCLUDE_DIR)/*.o $(BIN_DIR)/*
+	rm -r $(SERVER_DIR)/auth/*.o $(SERVER_DIR)/fileserv/*.o 

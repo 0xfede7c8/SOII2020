@@ -9,6 +9,8 @@
 #include <netdb.h> 
 #include <stdint.h>
 
+#define PORT_MAX_LENGTH 5u
+
 /**
  * Conectarse mediante TCP/IP a un servidor
  *

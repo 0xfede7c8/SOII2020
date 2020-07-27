@@ -96,7 +96,7 @@ Message listUsers(const int authSockFd, const int serverFd)
 	Message message = sendMessage(serverFd, USER_LIST);
 	
 	if (messageOk(message)) {
-		message = receiveUserList(serverFd, printUser);
+		message = receiveStrings(serverFd, printUser);
 	} 
 	return message;
 }

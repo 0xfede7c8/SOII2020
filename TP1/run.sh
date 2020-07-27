@@ -7,6 +7,11 @@ set -e    # Para que retorne el script si algo falla
 # Creamos directorios de buildeo si no existen ya
 mkdir -p bin
 
+# Matamos procesos viejos
+echo "\e[32mMatando procesos viejos...\e[0m" 
+# kill -9 $(pidof ./bin/auth) 2> /dev/null || true
+# kill -9 $(pidof ./bin/server) 2> /dev/null || true
+# kill -9 $(pidof ./bin/fileserv) 2> /dev/null || true
 
 # ----- COMPILACION -------
 
@@ -31,7 +36,8 @@ then
 	# Ejecutamos el backend
 	echo "\e[32mEjecutando backend...\e[0m"
 	./bin/auth 5001 &
-	./bin/server 5000 127.0.0.1 5001
+	./bin/fileserv 5002 &
+	./bin/server 5000 127.0.0.1 5001 5002
 else
 	echo "\e[32mOpcion no reconocida: use 'client' o 'backend'\e[0m"
 fi
