@@ -3,12 +3,14 @@
 #define FILES_HANDLING_H
 
 #include <stdio.h>
+#include <unistd.h>
 
 #include "message_transmission.h"
 #include "files_definitions.h"
 #include "md5.h"
+#include "mbr.h"
 
-#define TMP_FILE_PATH "bin/file_download/download.iso"
+#define RETRY_TIMES 3u
 
 Message listFiles(const int serverFd)
 {
@@ -22,20 +24,38 @@ Message listFiles(const int serverFd)
             for (i = 0u; i < db.dbSize; i++) {
                 printf("%s | %lu | ", db.userInfo[i].fileName,
                                       db.userInfo[i].size);
-                size_t j;
-                /* Transformamos el digesto MD5 en ASCII */
-                for (j=0u; j<MD5_DIGEST_LENGTH; j++)
-                {
-                    printf("%02x", db.userInfo[i].md5Sum[j]);
-                }
-                printf("\n");
+                printMD5Digest(db.userInfo[i].md5Sum);
             }
         }
     }
     return message;
 }
 
-Message getFile(const int serverFd, const char* ip, char *filename)
+void printStats(const char *devicePath, const size_t amountWritten)
+{   
+    size_t sizeOfData;
+    unsigned char digest[MD5_DIGEST_LENGTH];
+    if (calculateMD5(devicePath, digest, &sizeOfData, amountWritten)) {
+        printf("MD5 checksum:");
+        printMD5Digest(digest);
+        printMBRInfo(devicePath);
+    }
+}
+
+int connectToFilesServer(const char *ip, const char *port)
+{
+    uint32_t retries = 0u;
+    int fd = 0;
+    while (fd <= 0 && retries <= RETRY_TIMES) {
+        fd = TCPConnect(ip, port);
+        retries++;
+        sleep(1);
+    }
+    return fd;
+}
+
+/* Protocolo para la descarga de archivo desde el fileserver */
+Message getFile(const int serverFd, const char *ip, const char *filename, const char *deviceName)
 {   
     /* Pedimos al server que nos de el puerto del file server */
     Message message = sendMessage(serverFd, GET_FILE_SERVER_PORT);
@@ -44,14 +64,32 @@ Message getFile(const int serverFd, const char* ip, char *filename)
         /* El servidor nos devuelve el puerto al cual comunicarnos para descargar el archivo */
         message = receivePort(serverFd, port);
         if (messageOk(message)) {
-            const int fileSockFd = TCPConnect(ip, port);
+
+            const int fileSockFd = connectToFilesServer(ip, port);
+            
             if (fileSockFd > 0) {
                 /* Enviamos al file server el nombre del archivo a descargar */
                 message = checkMessageSend(write(fileSockFd, filename, MAX_FILENAME_LENGTH));
                 if (messageOk(message)) {
-                    printf("[*] Recibiendo imágen...\n");
-                    message = receiveFile(fileSockFd, TMP_FILE_PATH);
-                    printf("[*] Imágen recibida exitosamente.\n");
+                    size_t amountWritten;
+                    /* File server nos dice si se puede descargar */
+                    message = receiveMessage(fileSockFd);
+                    switch(message) {
+                        case FILE_DOWN_AUTHORIZED:
+                            printf("[*] Recibiendo y grabando imágen...\n");
+                            message = receiveBootableFileAndStore(fileSockFd, deviceName, &amountWritten);
+                            if (messageOk(message)) {
+                                printf("[+] Imágen grabada exitosamente.\n");
+                                printStats(deviceName, amountWritten);
+                            }
+                            break;
+                        case FILE_DOWN_REJECTED:
+                            printf("[-] No se puede descargar la imágen. Archivo inexistente.\n");
+                            break;
+                        default:
+                            printf("[-] Error con el servidor de archivos.\n");
+                    }
+                    close(fileSockFd);
                 }
             } else {
                 printf("[-] No se pudo conectar al files server\n");

@@ -34,9 +34,12 @@ int main(const int argc, const char *argv[])
                         printf("file: [-] Comando recibido no identificado\n");
                         message = sendMessage(serverFd, MESSAGE_FAILED);
                 }
+                if (message != MESSAGE_SUCCESS) {
+                    printf("file: [-] Error al ejecutar operación\n");
+                }
             }
         } else {
-            perror("server: [-] Problema creando servidor de archivos. Saliendo");
+            perror("file: [-] Problema creando servidor de archivos. Saliendo");
             exit(1);
         }        
     } else {

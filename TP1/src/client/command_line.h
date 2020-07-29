@@ -106,10 +106,9 @@ bool runCommand(const int argc, char* argv[], const char* ip, const int fd)
 				message = listFiles(fd);
 			}
 			else {    // file down
-				result = (strcmp(argv[1], "down") == 0) && (argc == 3);
+				result = (strcmp(argv[1], "down") == 0) && (argc == 4);
 				if (result) {
-                    printf("%s %s\n", ip, argv[2]);
-					message = getFile(fd, ip, argv[2]);
+					message = getFile(fd, ip, argv[2], argv[3]);
 				}
 			}
 		}

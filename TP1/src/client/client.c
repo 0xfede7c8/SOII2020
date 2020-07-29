@@ -19,7 +19,6 @@ void sigintHandler(int sig_num)
     safeExit(sockfd); 
 } 
 
-
 void printHelp(const int argc, char *argv[])
 {
 	if (argc < 3) {
@@ -36,6 +35,8 @@ int main(int argc, char *argv[])
 
 	sockfd = TCPConnect(argv[1], argv[2]);
 
+	char *ip = argv[1];
+
 	if (sockfd > 0)	{
 		if (authenticate(sockfd, sockfd)) {
 			setPromptUsername(getAutheticatedUsername());
@@ -47,7 +48,7 @@ int main(int argc, char *argv[])
 					char* nargv[MAX_CMD_ARGS];
 					int nargc;
 					splitCommand(command, nargv, &nargc);
-					if (!runCommand(nargc, nargv, argv[1], sockfd)) {
+					if (!runCommand(nargc, nargv, ip, sockfd)) {
 						printf("[-] Comando no reconocido: %s\n", command);
 					}
 				}

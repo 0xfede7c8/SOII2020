@@ -5,8 +5,10 @@
 
 #include "message_transmission.h"
 #include "tcp_connection.h"
+#include "mbr.h"
 
 #define MAX_MESSAGE_LENGTH 1024
+
 
 Message sendMessage(const int fd, const Message message)
 {
@@ -165,8 +167,10 @@ Message sendFile(const int clientFd, const char *filePath)
         size_t n = fread(buff, MAX_MESSAGE_LENGTH, 1, fp); 
         while (n > 0) {
             n = (size_t)write(clientFd, buff, MAX_MESSAGE_LENGTH);
-            totalSent += n;
-            n = fread(buff, MAX_MESSAGE_LENGTH, 1, fp); 
+            if (n > 0u) {
+                totalSent += n;
+                n = fread(buff, MAX_MESSAGE_LENGTH, 1, fp); 
+            }
         }
         close(clientFd);
         fclose(fp);
@@ -174,22 +178,35 @@ Message sendFile(const int clientFd, const char *filePath)
     return (totalSent > 0u) ? MESSAGE_SUCCESS : MESSAGE_FAILED;
 }
 
-Message receiveFile(const int serverFd, const char *filePath)
+Message receiveBootableFileAndStore(const int serverFd, const char *filePath, size_t *amountWritten)
 {   
-    char buff[MAX_MESSAGE_LENGTH];  // to store message from client
- 
-    FILE *fp = fopen(filePath, "wb"); 
+    char buff[MAX_MESSAGE_LENGTH];
 
-    ssize_t totalReceived = 0u;
+    FILE *fp = fopen(filePath, "wb");
+
+    (*amountWritten) = 0u;
     if (fp != NULL) {
         ssize_t n = read(serverFd, buff, MAX_MESSAGE_LENGTH);
-        while (n > 0) {
-            fwrite(buff, (size_t)n, 1, fp);
-            totalReceived += n;
-            n = read(serverFd, buff, MAX_MESSAGE_LENGTH); 
+        if (n > 0) {
+            /* Chequeamos que el primer sector contenga MBR, sino se anula */
+            if (isMBR((MBR*)buff)) {
+                while (n > 0) {
+                    n = (ssize_t)fwrite(buff, 1, (size_t)n, fp);
+                    if (n > 0) {
+                        (*amountWritten) += (size_t)n;
+                        n = read(serverFd, buff, MAX_MESSAGE_LENGTH); 
+                    } else {
+                        (*amountWritten) = 0;
+                    }
+                }
+            } else {
+                printf("[-] El archivo no contiene MBR. Descarga cancelada\n");
+            }
         }
         close(serverFd);
         fclose(fp);
+    } else {
+        perror("[-] No se pudo grabar la imágen\n");
     }
-    return (totalReceived > 0u) ? MESSAGE_SUCCESS : MESSAGE_FAILED;
+    return ((*amountWritten) > 0u) ? MESSAGE_SUCCESS : MESSAGE_FAILED;
 }

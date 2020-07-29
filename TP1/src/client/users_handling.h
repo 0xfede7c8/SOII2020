@@ -17,12 +17,12 @@ Message changePassword(const int serverFd, char *newPassword)
         if (messageOk(message)) {
             message = receiveMessage(serverFd);
             if (message == MESSAGE_SUCCESS) {
-                printf("client: [+] Password cambiada exitosamente\n");
+                printf("[+] Password cambiada exitosamente\n");
             } else {
-                printf("client: [-] Error al cambiar clave\n");
+                printf("[-] Error al cambiar clave\n");
             }
         } else {
-            printf("client: [-] Error al enviar nueva clave al servidor\n");
+            printf("[-] Error al enviar nueva clave al servidor\n");
         }
     } 
     return message;

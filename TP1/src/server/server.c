@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
         const int authSockFd = TCPConnect(argv[2], argv[3]);
         /* Conectamos al files server */
         const int filesSockFd = TCPConnect(argv[2], argv[4]);
-        if (authSockFd > 0) {
+        if ((authSockFd > 0) && (filesSockFd > 0)) {
             if (authenticate(authSockFd, clientFd)) {
                 while(1) {
                     Message message = receiveMessage(clientFd);
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
         close(authSockFd);
         close(filesSockFd);
         } else {
-                printf("[-] server: No se pudo establecer comunicación con el auth server\n");
+                printf("[-] server: No se pudo establecer comunicación con el authserver y/o fileserver\n");
         }
     close(clientFd);
     } else {

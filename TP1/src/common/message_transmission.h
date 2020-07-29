@@ -123,7 +123,7 @@ Message sendPort(const int fd, const char *port);
 
 Message sendFile(const int fd, const char *filename);
 
-Message receiveFile(const int fd, const char *filename);
+Message receiveBootableFileAndStore(const int fd, const char *filename, size_t *amountWritten);
 
 /**
  * Chequea si el mensaje fue enviado o recibido correctamente
