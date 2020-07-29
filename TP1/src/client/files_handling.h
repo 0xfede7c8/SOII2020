@@ -12,6 +12,12 @@
 
 #define RETRY_TIMES 3u
 
+/**
+ * Se comunica con el servidor para obtener la lista de archivos
+ *
+ * @param serverFd fd con conexión al servidor
+ * @return Message con resultado de la operación
+ */
 Message listFiles(const int serverFd)
 {
     Message message = sendMessage(serverFd, FILE_LIST);
@@ -31,17 +37,30 @@ Message listFiles(const int serverFd)
     return message;
 }
 
-void printStats(const char *devicePath, const size_t amountWritten)
+/**
+ * Imprime información sobre las particiones del archivo especificado
+ *
+ * @param devicePath path al dispositivo o archivo a analizar
+ * @param size tamaño del archivo
+ */
+void printStats(const char *devicePath, const size_t size)
 {   
     size_t sizeOfData;
     unsigned char digest[MD5_DIGEST_LENGTH];
-    if (calculateMD5(devicePath, digest, &sizeOfData, amountWritten)) {
+    if (calculateMD5(devicePath, digest, &sizeOfData, size)) {
         printf("MD5 checksum:");
         printMD5Digest(digest);
         printMBRInfo(devicePath);
     }
 }
 
+/**
+ * Trata de conectarse al servidor de archivos y reintenta de no ser posible
+ *
+ * @param ip ip a conectarse
+ * @param port puerto a conectarse
+ * @return file descriptor
+ */
 int connectToFilesServer(const char *ip, const char *port)
 {
     uint32_t retries = 0u;
@@ -54,7 +73,11 @@ int connectToFilesServer(const char *ip, const char *port)
     return fd;
 }
 
-/* Protocolo para la descarga de archivo desde el fileserver */
+
+/**
+ * Protocolo para la descarga de archivo desde el fileserver
+ *
+ */
 Message getFile(const int serverFd, const char *ip, const char *filename, const char *deviceName)
 {   
     /* Pedimos al server que nos de el puerto del file server */

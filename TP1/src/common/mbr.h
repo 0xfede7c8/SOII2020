@@ -15,6 +15,9 @@
 #define SECTOR_MASK 0x3Fu
 #define CYLINDER_MASK 0x3FF
 
+/**
+ * Estructura que representa una particion de MBR 
+ */
 typedef struct  __attribute__((__packed__)) Partition {
     uint8_t bootIndicator;
     uint8_t startAddrHead;
@@ -26,6 +29,9 @@ typedef struct  __attribute__((__packed__)) Partition {
     uint32_t size;
 } Partition;
 
+/**
+ * Estructura que representa el header de MBR 
+ */
 typedef struct  __attribute__((__packed__)) MBR {
     uint8_t code[440];
     uint32_t diskSig;
@@ -34,10 +40,28 @@ typedef struct  __attribute__((__packed__)) MBR {
     uint8_t bootSignature[2];
 } MBR;
 
+/**
+ * Chequea si la estructura MBR mbr tiene la signature correcta de MBR
+ *
+ * @param mbr puntero a estructura MBR
+ * @return bool con resultado de la operación
+ */
 bool isMBR(const MBR *mbr);
 
+/**
+ * A partir de un archivo, obtiene su header MBR y lo almacena en una estructura
+ *
+ * @param filePath nombre del archivo
+ * @param mbr puntero a estructura MBR donde se almacena el resultado
+ * @return bool con resultado de la operación
+ */
 bool getMBR(const char *filePath, MBR *mbr);
 
+/**
+ * Imprime informacion sobre el header MBR
+ *
+ * @param filePath nombre del archivo
+ */
 void printMBRInfo(const char *filePath);
 
 #endif

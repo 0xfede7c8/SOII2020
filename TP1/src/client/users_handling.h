@@ -6,6 +6,10 @@
 
 #include "message_transmission.h"
 
+/**
+ * Protocolo para cambiar password
+ *
+ */
 Message changePassword(const int serverFd, char *newPassword)
 {
     Message message = sendMessage(serverFd, USER_PASSWORD);
